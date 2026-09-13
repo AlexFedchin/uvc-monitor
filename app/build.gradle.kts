@@ -10,7 +10,10 @@ android {
     defaultConfig {
         applicationId = "com.example.uvcmonitor"
         minSdk = 26
-        targetSdk = 34
+        // Keep at 33: AUSBC 3.2.7's USBMonitor registers a receiver for a custom
+        // action without RECEIVER_EXPORTED/NOT_EXPORTED, which Android 14 rejects
+        // (SecurityException on launch) for apps targeting SDK 34.
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
     }
