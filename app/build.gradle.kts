@@ -45,3 +45,17 @@ dependencies {
     // (libuvc module never published, so libausbc cannot resolve).
     implementation("com.github.jiangdongguo.AndroidUSBCamera:libausbc:3.2.7")
 }
+
+// libausbc 3.2.7 still declares two dependencies that only ever lived on
+// JCenter (shut down). Both authors republished under new coordinates on
+// Maven Central, so redirect them there.
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("com.gyf.immersionbar:immersionbar"))
+            .using(module("com.geyifeng.immersionbar:immersionbar:3.2.2"))
+            .because("JCenter is gone; author republished on Maven Central")
+        substitute(module("com.zlc.glide:webpdecoder"))
+            .using(module("com.github.zjupure:webpdecoder:2.0.4.13.2"))
+            .because("JCenter is gone; same library, new groupId on Maven Central")
+    }
+}
