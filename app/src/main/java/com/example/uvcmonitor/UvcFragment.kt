@@ -4,7 +4,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import com.jiangdg.ausbc.CameraClient
 import com.jiangdg.ausbc.base.CameraFragment
@@ -32,19 +33,44 @@ class UvcFragment : CameraFragment() {
     private lateinit var rootView: View
     private lateinit var cameraContainer: ViewGroup
     private lateinit var gridView: ThirdsGridView
-    private lateinit var gridBtn: Button
+    private lateinit var gridBtn: ImageButton
+    private lateinit var resBtn: TextView
+
+    private var current = Resolution.P720
 
     override fun getRootView(inflater: LayoutInflater, container: ViewGroup?): View {
         rootView = inflater.inflate(R.layout.fragment_uvc, container, false)
         cameraContainer = rootView.findViewById(R.id.cameraViewContainer)
         gridView = rootView.findViewById(R.id.gridView)
         gridBtn = rootView.findViewById(R.id.gridBtn)
+        resBtn = rootView.findViewById(R.id.resBtn)
 
         gridBtn.setOnClickListener {
             gridView.visibility =
                 if (gridView.visibility == View.VISIBLE) View.GONE else View.VISIBLE
         }
+        resBtn.setOnClickListener { switchResolution(current.other()) }
         return rootView
+    }
+
+    private fun switchResolution(target: Resolution) {
+        // The size list is only known once the UVC device is open; if we have
+        // it, refuse sizes the device doesn't advertise instead of letting the
+        // library fall back to something random.
+        val sizes = getAllPreviewSizes()
+        if (!sizes.isNullOrEmpty() &&
+            sizes.none { it.width == target.width && it.height == target.height }
+        ) {
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.res_unsupported, getString(target.labelRes)),
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        current = target
+        resBtn.setText(target.labelRes)
+        updateResolution(target.width, target.height)
     }
 
     override fun initData() {
@@ -71,8 +97,8 @@ class UvcFragment : CameraFragment() {
     override fun getCameraClient(): CameraClient {
         val request = CameraRequest.Builder()
             .setFrontCamera(false)
-            .setPreviewWidth(1280)   // change to 1920 for 1080p if your capture card supports it
-            .setPreviewHeight(720)   // change to 1080 accordingly
+            .setPreviewWidth(current.width)
+            .setPreviewHeight(current.height)
             .create()
         // CameraUvcStrategy negotiates MJPEG first and falls back to YUYV, so no
         // explicit preview-format setting is needed for HDMI capture dongles.
@@ -84,5 +110,12 @@ class UvcFragment : CameraFragment() {
             .setDefaultRotateType(RotateType.ANGLE_0)
             .openDebug(false)
             .build()
+    }
+
+    private enum class Resolution(val width: Int, val height: Int, val labelRes: Int) {
+        P720(1280, 720, R.string.res_720p),
+        P1080(1920, 1080, R.string.res_1080p);
+
+        fun other() = if (this == P720) P1080 else P720
     }
 }

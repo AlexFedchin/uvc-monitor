@@ -16,12 +16,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Single control: show/hide the grid -->
-    <Button
-        android:id="@+id/gridBtn"
+    <!-- Overlay controls, bottom-right -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:text="@string/grid" />
+        android:layout_margin="12dp"
+        android:orientation="horizontal">
+
+        <!-- Preview resolution toggle; label shows the *current* resolution -->
+        <TextView
+            android:id="@+id/resBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minWidth="40dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:gravity="center"
+            android:background="@drawable/bg_control"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/res_720p"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <!-- Grid on/off -->
+        <ImageButton
+            android:id="@+id/gridBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:padding="8dp"
+            android:background="@drawable/bg_control"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_grid"
+            android:contentDescription="@string/toggle_grid" />
+    </LinearLayout>
 </FrameLayout>
