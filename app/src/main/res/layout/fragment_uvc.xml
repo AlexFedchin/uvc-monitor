@@ -16,6 +16,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Luminance histogram, top-right; hidden until toggled on -->
+    <com.example.uvcmonitor.HistogramView
+        android:id="@+id/histogramView"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="12dp"
+        android:visibility="gone" />
+
     <!-- Overlay controls, bottom-right -->
     <LinearLayout
         android:layout_width="wrap_content"
@@ -24,24 +33,16 @@
         android:layout_margin="12dp"
         android:orientation="horizontal">
 
-        <!-- Preview resolution toggle; label shows the *current* resolution -->
-        <TextView
-            android:id="@+id/resBtn"
-            android:layout_width="wrap_content"
+        <ImageButton
+            android:id="@+id/histBtn"
+            android:layout_width="40dp"
             android:layout_height="40dp"
-            android:minWidth="40dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:gravity="center"
+            android:padding="8dp"
             android:background="@drawable/bg_control"
-            android:clickable="true"
-            android:focusable="true"
-            android:text="@string/res_720p"
-            android:textColor="#FFFFFF"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_histogram"
+            android:contentDescription="@string/toggle_histogram" />
 
-        <!-- Grid on/off -->
         <ImageButton
             android:id="@+id/gridBtn"
             android:layout_width="40dp"
