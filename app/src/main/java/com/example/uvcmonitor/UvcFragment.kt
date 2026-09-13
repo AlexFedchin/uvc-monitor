@@ -6,11 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
-import com.jiangdg.ausbc.MultiCameraClient
+import com.jiangdg.ausbc.CameraClient
 import com.jiangdg.ausbc.base.CameraFragment
-import com.jiangdg.ausbc.callback.ICameraStateCallBack
+import com.jiangdg.ausbc.camera.CameraUvcStrategy
 import com.jiangdg.ausbc.camera.bean.CameraRequest
+import com.jiangdg.ausbc.camera.bean.CameraStatus
 import com.jiangdg.ausbc.render.env.RotateType
+import com.jiangdg.ausbc.utils.bus.BusKey
+import com.jiangdg.ausbc.utils.bus.EventBus
 import com.jiangdg.ausbc.widget.AspectRatioTextureView
 import com.jiangdg.ausbc.widget.IAspectRatio
 
@@ -19,6 +22,10 @@ import com.jiangdg.ausbc.widget.IAspectRatio
  * overlay. Nothing is recorded or stored on the phone — this is a monitor only.
  * Extends the AUSBC CameraFragment, which handles USB permission, opening the
  * UVC device and rendering the preview.
+ *
+ * Written against AUSBC 3.2.7 (see app/build.gradle.kts for why not 3.3.x):
+ * the camera is configured by overriding [getCameraClient], and camera state
+ * arrives on the library's EventBus rather than an override hook.
  */
 class UvcFragment : CameraFragment() {
 
@@ -40,6 +47,20 @@ class UvcFragment : CameraFragment() {
         return rootView
     }
 
+    override fun initData() {
+        super.initData()
+        // The UVC strategy posts START / STOP / ERROR / ERROR_PREVIEW_SIZE here.
+        EventBus.with<CameraStatus>(BusKey.KEY_CAMERA_STATUS).observe(this) { status ->
+            if (status.code < 0) {
+                Toast.makeText(
+                    requireContext(),
+                    "Camera error: ${status.message ?: "unknown"}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     // Return a fresh render view; the library inserts it into the container below.
     override fun getCameraView(): IAspectRatio = AspectRatioTextureView(requireContext())
 
@@ -47,25 +68,21 @@ class UvcFragment : CameraFragment() {
 
     override fun getGravity(): Int = Gravity.CENTER
 
-    override fun getCameraRequest(): CameraRequest {
-        return CameraRequest.Builder()
+    override fun getCameraClient(): CameraClient {
+        val request = CameraRequest.Builder()
+            .setFrontCamera(false)
             .setPreviewWidth(1280)   // change to 1920 for 1080p if your capture card supports it
             .setPreviewHeight(720)   // change to 1080 accordingly
-            .setRenderMode(CameraRequest.RenderMode.OPENGL)
-            .setDefaultRotateType(RotateType.ANGLE_0)
-            .setPreviewFormat(CameraRequest.PreviewFormat.FORMAT_MJPEG) // MJPEG = best for HDMI dongles
-            .setAspectRatioShow(true)
             .create()
-    }
-
-    override fun onCameraState(
-        self: MultiCameraClient.ICamera,
-        code: ICameraStateCallBack.State,
-        msg: String?
-    ) {
-        if (code == ICameraStateCallBack.State.ERROR) {
-            Toast.makeText(requireContext(), "Camera error: ${msg ?: "unknown"}", Toast.LENGTH_SHORT)
-                .show()
-        }
+        // CameraUvcStrategy negotiates MJPEG first and falls back to YUYV, so no
+        // explicit preview-format setting is needed for HDMI capture dongles.
+        return CameraClient.newBuilder(requireContext())
+            .setEnableGLES(true)     // OpenGL render path
+            .setRawImage(true)
+            .setCameraStrategy(CameraUvcStrategy(requireContext()))
+            .setCameraRequest(request)
+            .setDefaultRotateType(RotateType.ANGLE_0)
+            .openDebug(false)
+            .build()
     }
 }
