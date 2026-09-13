@@ -40,6 +40,8 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
-    // UVC / HDMI-capture engine (jiangdongguo AUSBC), pulled from JitPack
-    implementation("com.github.jiangdongguo.AndroidUSBCamera:libausbc:3.3.3")
+    // UVC / HDMI-capture engine (jiangdongguo AUSBC), pulled from JitPack.
+    // 3.2.7 is the newest tag JitPack built successfully; 3.3.x builds are broken
+    // (libuvc module never published, so libausbc cannot resolve).
+    implementation("com.github.jiangdongguo.AndroidUSBCamera:libausbc:3.2.7")
 }
