@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Typical UVC composite capture device (Misc / IAD) -->
+    <usb-device class="239" subclass="2" protocol="1" />
+    <!-- USB Video Class interface -->
+    <usb-device class="14" />
+    <!-- Some capture dongles enumerate as vendor-specific -->
+    <usb-device class="255" />
+</resources>

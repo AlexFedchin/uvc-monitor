@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <!-- The library injects the camera render view into this empty container -->
+    <FrameLayout
+        android:id="@+id/cameraViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Rule-of-thirds overlay, drawn on top of the preview -->
+    <com.example.uvcmonitor.ThirdsGridView
+        android:id="@+id/gridView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Single control: show/hide the grid -->
+    <Button
+        android:id="@+id/gridBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:text="@string/grid" />
+</FrameLayout>
