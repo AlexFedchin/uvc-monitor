@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">HDMI Monitor</string>
     <string name="grid">GRID</string>
+    <string name="crash_title">The app crashed</string>
+    <string name="crash_copy">Copy</string>
+    <string name="crash_restart">Restart</string>
+    <string name="crash_close">Close</string>
 </resources>
